@@ -47,9 +47,8 @@
 #define H_KERN_VIRT_SIZE  ASM_CONST(0x0000400000000000) /* 64T */
 
 /*
- * The vmalloc space starts at the beginning of that region, and
- * occupies half of it on hash CPUs and a quarter of it on Book3E
- * (we keep a quarter for the virtual memmap)
+ * The vmalloc space starts at the beginning of the kernel non-linear virtual
+ * region, and occupies 56T on hash CPUs.
  */
 #define H_VMALLOC_START	H_KERN_VIRT_START
 #define H_VMALLOC_SIZE	ASM_CONST(0x380000000000) /* 56T */
