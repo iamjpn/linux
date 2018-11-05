@@ -44,17 +44,22 @@
  * Define the address range of the kernel non-linear virtual area
  */
 #define H_KERN_VIRT_START ASM_CONST(0xD000000000000000)
+
+#ifdef CONFIG_PPC_64K_PAGES
 #define H_KERN_VIRT_SIZE  ASM_CONST(0x0002000000000000) /* 512T */
+#else
+#define H_KERN_VIRT_SIZE  ASM_CONST(0x0000400000000000) /* 64T */
+#endif
 
 /*
  * The vmalloc space starts at the beginning of the kernel non-linear virtual
- * region, and occupies 504T on hash CPUs. Which leaves 8T for IO mappings.
+ * region, and occupies 504T on hash CPUs with 64K pages, or 64T with 4K pages.
+ * In both cases we leave 8T for IO mappings.
  */
 #define H_VMALLOC_START	H_KERN_VIRT_START
-#define H_VMALLOC_SIZE	ASM_CONST(0x1f80000000000) /* 504T */
-#define H_VMALLOC_END	(H_VMALLOC_START + H_VMALLOC_SIZE)
-
-#define H_KERN_IO_START	H_VMALLOC_END
+#define H_KERN_IO_SIZE	ASM_CONST(0x0000080000000000) /* 8T */
+#define H_KERN_IO_START	(H_KERN_VIRT_START + H_KERN_VIRT_SIZE - H_KERN_IO_SIZE)
+#define H_VMALLOC_END	H_KERN_IO_START
 
 /*
  * Region IDs
