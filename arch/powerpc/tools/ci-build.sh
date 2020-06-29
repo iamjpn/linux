@@ -37,10 +37,6 @@ if [[ -n "$TARGETS" ]]; then
     cmd+="-e TARGETS=$TARGETS "
 fi
 
-if [[ "$TARGET" == "kernel" ]]; then
-    cmd+="-e QUIET=1 "
-fi
-
 cmd+="linuxppc/build:$IMAGE-$(uname -m) "
 cmd+="/bin/container-build.sh $TARGET"
 
