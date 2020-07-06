@@ -23,6 +23,8 @@
 
 /* Radix page table supported and enabled */
 #define MMU_FTR_TYPE_RADIX		ASM_CONST(0x00000040)
+#define MMU_FTR_PKEY			ASM_CONST(0x00000080)
+#define MMU_FTR_KUEP			ASM_CONST(0x00000100)
 
 /*
  * Individual features below.
@@ -110,7 +112,7 @@
 /*
  * Supports KUAP (key 0 controlling userspace addresses) on radix
  */
-#define MMU_FTR_RADIX_KUAP		ASM_CONST(0x80000000)
+#define MMU_FTR_KUAP			ASM_CONST(0x80000000)
 
 /* MMU feature bit sets for various CPUs */
 #define MMU_FTRS_DEFAULT_HPTE_ARCH_V2	\
@@ -173,10 +175,17 @@ enum {
 #endif
 #ifdef CONFIG_PPC_RADIX_MMU
 		MMU_FTR_TYPE_RADIX |
-#ifdef CONFIG_PPC_KUAP
-		MMU_FTR_RADIX_KUAP |
-#endif /* CONFIG_PPC_KUAP */
 #endif /* CONFIG_PPC_RADIX_MMU */
+#ifdef CONFIG_PPC_KUAP
+	MMU_FTR_KUAP |
+#endif /* CONFIG_PPC_KUAP */
+#ifdef CONFIG_PPC_MEM_KEYS
+	MMU_FTR_PKEY |
+#endif
+#ifdef CONFIG_PPC_KUEP
+	MMU_FTR_KUEP |
+#endif /* CONFIG_PPC_KUAP */
+
 		0,
 };
 
@@ -355,6 +364,8 @@ extern void early_init_mmu_secondary(void);
 extern void setup_initial_memory_limit(phys_addr_t first_memblock_base,
 				       phys_addr_t first_memblock_size);
 static inline void mmu_early_init_devtree(void) { }
+
+static inline void pkey_early_init_devtree(void) {}
 
 extern void *abatron_pteptrs[2];
 #endif /* __ASSEMBLY__ */
