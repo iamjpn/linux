@@ -14,6 +14,7 @@ cmd+="-e ARCH "
 cmd+="-e DEFCONFIG=$DEFCONFIG "
 cmd+="-e JFACTOR=$(nproc) "
 cmd+="-e KBUILD_BUILD_TIMESTAMP=$(date +%Y-%m-%d) "
+cmd+="-e CLANG "
 
 if [[ "$SUBARCH" == "ppc64" ]]; then
     cross="powerpc-linux-gnu-"
@@ -32,8 +33,8 @@ cmd+="-v $HOME/.ccache:/ccache:rw "
 cmd+="-e CCACHE_DIR=/ccache "
 cmd+="-e CCACHE=1 "
 
-if [[ "$TARGET" == "kernel" ]]; then
-    cmd+="-e QUIET=1 "
+if [[ -n "$TARGETS" ]]; then
+    cmd+="-e TARGETS=$TARGETS "
 fi
 
 cmd+="linuxppc/build:$IMAGE-$(uname -m) "
