@@ -146,7 +146,7 @@ union vsx_reg {
  * otherwise.
  */
 extern int analyse_instr(struct instruction_op *op, const struct pt_regs *regs,
-			 struct ppc_inst instr);
+			 unsigned long instr);
 
 /*
  * Emulate an instruction that can be executed just by updating
@@ -163,7 +163,7 @@ void emulate_update_regs(struct pt_regs *reg, struct instruction_op *op);
  * 0 if it could not be emulated, or -1 for an instruction that
  * should not be emulated (rfid, mtmsrd clearing MSR_RI, etc.).
  */
-extern int emulate_step(struct pt_regs *regs, struct ppc_inst instr);
+extern int emulate_step(struct pt_regs *regs, unsigned long instr);
 
 /*
  * Emulate a load or store instruction by reading/writing the

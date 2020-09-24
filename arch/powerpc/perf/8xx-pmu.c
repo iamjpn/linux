@@ -166,7 +166,7 @@ static void mpc8xx_pmu_del(struct perf_event *event, int flags)
 	case PERF_8xx_ID_ITLB_LOAD_MISS:
 		if (atomic_dec_return(&itlb_miss_ref) == 0) {
 			/* mfspr r10, SPRN_SPRG_SCRATCH0 */
-			struct ppc_inst insn = ppc_inst(PPC_INST_MFSPR | __PPC_RS(R10) |
+			unsigned long insn = ppc_inst(PPC_INST_MFSPR | __PPC_RS(R10) |
 					    __PPC_SPR(SPRN_SPRG_SCRATCH0));
 
 			patch_instruction_site(&patch__itlbmiss_exit_1, insn);
@@ -175,7 +175,7 @@ static void mpc8xx_pmu_del(struct perf_event *event, int flags)
 	case PERF_8xx_ID_DTLB_LOAD_MISS:
 		if (atomic_dec_return(&dtlb_miss_ref) == 0) {
 			/* mfspr r10, SPRN_DAR */
-			struct ppc_inst insn = ppc_inst(PPC_INST_MFSPR | __PPC_RS(R10) |
+			unsigned long insn = ppc_inst(PPC_INST_MFSPR | __PPC_RS(R10) |
 					    __PPC_SPR(SPRN_DAR));
 
 			patch_instruction_site(&patch__dtlbmiss_exit_1, insn);

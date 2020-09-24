@@ -9,8 +9,8 @@
 #include <asm/ppc-opcode.h>
 
 #ifdef CONFIG_PPC64
-int probe_user_read_inst(struct ppc_inst *inst,
-			 struct ppc_inst __user *nip)
+int probe_user_read_inst(unsigned long *inst,
+			 unsigned long __user *nip)
 {
 	unsigned int val, suffix;
 	int err;
@@ -27,8 +27,8 @@ int probe_user_read_inst(struct ppc_inst *inst,
 	return err;
 }
 
-int probe_kernel_read_inst(struct ppc_inst *inst,
-			   struct ppc_inst *src)
+int probe_kernel_read_inst(unsigned long *inst,
+			   unsigned long *src)
 {
 	unsigned int val, suffix;
 	int err;
@@ -45,8 +45,8 @@ int probe_kernel_read_inst(struct ppc_inst *inst,
 	return err;
 }
 #else /* !CONFIG_PPC64 */
-int probe_user_read_inst(struct ppc_inst *inst,
-			 struct ppc_inst __user *nip)
+int probe_user_read_inst(unsigned long *inst,
+			 unsigned long __user *nip)
 {
 	unsigned int val;
 	int err;
@@ -58,8 +58,8 @@ int probe_user_read_inst(struct ppc_inst *inst,
 	return err;
 }
 
-int probe_kernel_read_inst(struct ppc_inst *inst,
-			   struct ppc_inst *src)
+int probe_kernel_read_inst(unsigned long *inst,
+			   unsigned long *src)
 {
 	unsigned int val;
 	int err;

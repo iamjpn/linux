@@ -110,7 +110,7 @@ static inline int __access_ok(unsigned long addr, unsigned long size,
 ({									\
 	long __gui_ret = 0;						\
 	unsigned long __gui_ptr = (unsigned long)ptr;			\
-	struct ppc_inst __gui_inst;					\
+	unsigned long __gui_inst;					\
 	unsigned int __prefix, __suffix;				\
 	__gui_ret = gu_op(__prefix, (unsigned int __user *)__gui_ptr);	\
 	if (__gui_ret == 0) {						\
@@ -139,13 +139,13 @@ static inline int __access_ok(unsigned long addr, unsigned long size,
 
 #else /* !CONFIG_PPC64 */
 #define get_user_instr(x, ptr) \
-	get_user((x).val, (u32 __user *)(ptr))
+	get_user((x), (u32 __user *)(ptr))
 
 #define __get_user_instr(x, ptr) \
-	__get_user_nocheck((x).val, (u32 __user *)(ptr), sizeof(u32), true)
+	__get_user_nocheck((x), (u32 __user *)(ptr), sizeof(u32), true)
 
 #define __get_user_instr_inatomic(x, ptr) \
-	__get_user_nosleep((x).val, (u32 __user *)(ptr), sizeof(u32))
+	__get_user_nosleep((x), (u32 __user *)(ptr), sizeof(u32))
 
 #endif /* CONFIG_PPC64 */
 

@@ -636,7 +636,7 @@ struct compute_test {
 	struct {
 		char *descr;
 		unsigned long flags;
-		struct ppc_inst instr;
+		unsigned long instr;
 		struct pt_regs regs;
 	} subtests[MAX_SUBTESTS + 1];
 };
@@ -1303,7 +1303,7 @@ static struct compute_test compute_tests[] = {
 };
 
 static int __init emulate_compute_instr(struct pt_regs *regs,
-					struct ppc_inst instr,
+					unsigned long instr,
 					bool negative)
 {
 	int analysed;
@@ -1329,7 +1329,7 @@ static int __init emulate_compute_instr(struct pt_regs *regs,
 }
 
 static int __init execute_compute_instr(struct pt_regs *regs,
-					struct ppc_inst instr)
+					unsigned long instr)
 {
 	extern int exec_instr(struct pt_regs *regs);
 
@@ -1360,7 +1360,7 @@ static void __init run_tests_compute(void)
 	struct compute_test *test;
 	struct pt_regs *regs, exp, got;
 	unsigned int i, j, k;
-	struct ppc_inst instr;
+	unsigned long instr;
 	bool ignore_gpr, ignore_xer, ignore_ccr, passed, rc, negative;
 
 	for (i = 0; i < ARRAY_SIZE(compute_tests); i++) {

@@ -8,45 +8,39 @@
  * Instruction data type for POWER
  */
 
-struct ppc_inst {
-	u32 val;
-#ifdef CONFIG_PPC64
-	u32 suffix;
-#endif
-} __packed;
 
-static inline u32 ppc_inst_val(struct ppc_inst x)
-{
-	return x.val;
-}
-
-static inline int ppc_inst_primary_opcode(struct ppc_inst x)
-{
-	return ppc_inst_val(x) >> 26;
-}
 
 #ifdef CONFIG_PPC64
-#define ppc_inst(x) ((struct ppc_inst){ .val = (x), .suffix = 0xff })
+#define ppc_inst(x) (x)
 
-#define ppc_inst_prefix(x, y) ((struct ppc_inst){ .val = (x), .suffix = (y) })
+#define ppc_inst_prefix(x, y) (((unsigned long)(x) << 32) | ((y) & 0xffffffff))
 
-static inline u32 ppc_inst_suffix(struct ppc_inst x)
+static inline bool ppc_inst_prefixed(unsigned long x)
 {
-	return x.suffix;
+	return ((x >> 32) >> 26 == 1);
 }
 
-static inline bool ppc_inst_prefixed(struct ppc_inst x)
+static inline u32 ppc_inst_val(unsigned long x)
 {
-	return (ppc_inst_primary_opcode(x) == 1) && ppc_inst_suffix(x) != 0xff;
+	if (ppc_inst_prefixed(x))
+		return x >> 32;
+	else
+		return x & 0xffffffff;
 }
 
-static inline struct ppc_inst ppc_inst_swab(struct ppc_inst x)
+static inline u32 ppc_inst_suffix(unsigned long x)
+{
+	return x & 0xffffffff;
+}
+
+
+static inline unsigned long ppc_inst_swab(unsigned long x)
 {
 	return ppc_inst_prefix(swab32(ppc_inst_val(x)),
 			       swab32(ppc_inst_suffix(x)));
 }
 
-static inline struct ppc_inst ppc_inst_read(const struct ppc_inst *ptr)
+static inline unsigned long ppc_inst_read(const unsigned long *ptr)
 {
 	u32 val, suffix;
 
@@ -59,43 +53,48 @@ static inline struct ppc_inst ppc_inst_read(const struct ppc_inst *ptr)
 	}
 }
 
-static inline bool ppc_inst_equal(struct ppc_inst x, struct ppc_inst y)
-{
-	return *(u64 *)&x == *(u64 *)&y;
-}
-
 #else
 
-#define ppc_inst(x) ((struct ppc_inst){ .val = x })
+#define ppc_inst(x) (x)
 
-static inline bool ppc_inst_prefixed(struct ppc_inst x)
+static inline u32 ppc_inst_val(unsigned long x)
+{
+	return x;
+}
+
+static inline bool ppc_inst_prefixed(unsigned long x)
 {
 	return false;
 }
 
-static inline u32 ppc_inst_suffix(struct ppc_inst x)
+static inline u32 ppc_inst_suffix(unsigned long x)
 {
 	return 0;
 }
 
-static inline struct ppc_inst ppc_inst_swab(struct ppc_inst x)
+static inline unsigned long ppc_inst_swab(unsigned long x)
 {
 	return ppc_inst(swab32(ppc_inst_val(x)));
 }
 
-static inline struct ppc_inst ppc_inst_read(const struct ppc_inst *ptr)
+static inline unsigned long ppc_inst_read(const unsigned long *ptr)
 {
 	return *ptr;
 }
 
-static inline bool ppc_inst_equal(struct ppc_inst x, struct ppc_inst y)
-{
-	return ppc_inst_val(x) == ppc_inst_val(y);
-}
-
 #endif /* CONFIG_PPC64 */
 
-static inline int ppc_inst_len(struct ppc_inst x)
+static inline int ppc_inst_primary_opcode(unsigned long x)
+{
+	return ppc_inst_val(x) >> 26;
+}
+
+static inline bool ppc_inst_equal(unsigned long x, unsigned long y)
+{
+	return x == y;
+}
+
+static inline int ppc_inst_len(unsigned long x)
 {
 	return ppc_inst_prefixed(x) ? 8 : 4;
 }
@@ -104,16 +103,16 @@ static inline int ppc_inst_len(struct ppc_inst x)
  * Return the address of the next instruction, if the instruction @value was
  * located at @location.
  */
-static inline struct ppc_inst *ppc_inst_next(void *location, struct ppc_inst *value)
+static inline unsigned long *ppc_inst_next(void *location, unsigned long *value)
 {
-	struct ppc_inst tmp;
+	unsigned long tmp;
 
 	tmp = ppc_inst_read(value);
 
 	return location + ppc_inst_len(tmp);
 }
 
-static inline u64 ppc_inst_as_u64(struct ppc_inst x)
+static inline u64 ppc_inst_as_u64(unsigned long x)
 {
 #ifdef CONFIG_CPU_LITTLE_ENDIAN
 	return (u64)ppc_inst_suffix(x) << 32 | ppc_inst_val(x);
@@ -124,7 +123,7 @@ static inline u64 ppc_inst_as_u64(struct ppc_inst x)
 
 #define PPC_INST_STR_LEN sizeof("00000000 00000000")
 
-static inline char *__ppc_inst_as_str(char str[PPC_INST_STR_LEN], struct ppc_inst x)
+static inline char *__ppc_inst_as_str(char str[PPC_INST_STR_LEN], unsigned long x)
 {
 	if (ppc_inst_prefixed(x))
 		sprintf(str, "%08x %08x", ppc_inst_val(x), ppc_inst_suffix(x));
@@ -141,10 +140,10 @@ static inline char *__ppc_inst_as_str(char str[PPC_INST_STR_LEN], struct ppc_ins
 	__str;				\
 })
 
-int probe_user_read_inst(struct ppc_inst *inst,
-			 struct ppc_inst __user *nip);
+int probe_user_read_inst(unsigned long *inst,
+			 unsigned long __user *nip);
 
-int probe_kernel_read_inst(struct ppc_inst *inst,
-			   struct ppc_inst *src);
+int probe_kernel_read_inst(unsigned long *inst,
+			   unsigned long *src);
 
 #endif /* _ASM_POWERPC_INST_H */

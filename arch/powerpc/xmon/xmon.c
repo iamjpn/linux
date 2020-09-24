@@ -99,7 +99,7 @@ static long *xmon_fault_jmp[NR_CPUS];
 /* Breakpoint stuff */
 struct bpt {
 	unsigned long	address;
-	struct ppc_inst	*instr;
+	unsigned long	*instr;
 	atomic_t	ref_count;
 	int		enabled;
 	unsigned long	pad;
@@ -121,7 +121,7 @@ static unsigned bpinstr = 0x7fe00008;	/* trap */
 static int cmds(struct pt_regs *);
 static int mread(unsigned long, void *, int);
 static int mwrite(unsigned long, void *, int);
-static int mread_instr(unsigned long, struct ppc_inst *);
+static int mread_instr(unsigned long, unsigned long *);
 static int handle_fault(struct pt_regs *);
 static void byterev(unsigned char *, int);
 static void memex(void);
@@ -902,7 +902,7 @@ static struct bpt *new_breakpoint(unsigned long a)
 static void insert_bpts(void)
 {
 	int i;
-	struct ppc_inst instr, instr2;
+	unsigned long instr, instr2;
 	struct bpt *bp, *bp2;
 
 	bp = bpts;
@@ -949,7 +949,7 @@ static void insert_bpts(void)
 				  ppc_inst(bpinstr));
 		if (bp->enabled & BP_CIABR)
 			continue;
-		if (patch_instruction((struct ppc_inst *)bp->address,
+		if (patch_instruction((unsigned long *)bp->address,
 				      ppc_inst(bpinstr)) != 0) {
 			printf("Couldn't write instruction at %lx, "
 			       "disabling breakpoint there\n", bp->address);
@@ -981,7 +981,7 @@ static void remove_bpts(void)
 {
 	int i;
 	struct bpt *bp;
-	struct ppc_inst instr;
+	unsigned long instr;
 
 	bp = bpts;
 	for (i = 0; i < NBPTS; ++i, ++bp) {
@@ -990,7 +990,7 @@ static void remove_bpts(void)
 		if (mread_instr(bp->address, &instr)
 		    && ppc_inst_equal(instr, ppc_inst(bpinstr))
 		    && patch_instruction(
-			(struct ppc_inst *)bp->address, ppc_inst_read(bp->instr)) != 0)
+			(unsigned long *)bp->address, ppc_inst_read(bp->instr)) != 0)
 			printf("Couldn't remove breakpoint at %lx\n",
 			       bp->address);
 	}
@@ -1197,7 +1197,7 @@ static int do_step(struct pt_regs *regs)
  */
 static int do_step(struct pt_regs *regs)
 {
-	struct ppc_inst instr;
+	unsigned long instr;
 	int stepped;
 
 	force_enable_xmon();
@@ -1363,7 +1363,7 @@ csum(void)
  */
 static long check_bp_loc(unsigned long addr)
 {
-	struct ppc_inst instr;
+	unsigned long instr;
 
 	addr &= ~3;
 	if (!is_kernel_addr(addr)) {
@@ -2210,7 +2210,7 @@ mwrite(unsigned long adrs, void *buf, int size)
 }
 
 static int
-mread_instr(unsigned long adrs, struct ppc_inst *instr)
+mread_instr(unsigned long adrs, unsigned long *instr)
 {
 	volatile int n;
 
@@ -2218,7 +2218,7 @@ mread_instr(unsigned long adrs, struct ppc_inst *instr)
 	if (setjmp(bus_error_jmp) == 0) {
 		catch_memory_errors = 1;
 		sync();
-		*instr = ppc_inst_read((struct ppc_inst *)adrs);
+		*instr = ppc_inst_read((unsigned long *)adrs);
 		sync();
 		/* wait a little while to see if we get a machine check */
 		__delay(200);
@@ -2954,7 +2954,7 @@ generic_inst_dump(unsigned long adr, long count, int praddr,
 {
 	int nr, dotted;
 	unsigned long first_adr;
-	struct ppc_inst inst, last_inst = ppc_inst(0);
+	unsigned long inst, last_inst = ppc_inst(0);
 
 	dotted = 0;
 	for (first_adr = adr; count > 0; --count, adr += ppc_inst_len(inst)) {

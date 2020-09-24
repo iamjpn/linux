@@ -560,7 +560,7 @@ static bool check_dawrx_constraints(struct pt_regs *regs, int type,
  * Return true if the event is valid wrt dawr configuration,
  * including extraneous exception. Otherwise return false.
  */
-static bool check_constraints(struct pt_regs *regs, struct ppc_inst instr,
+static bool check_constraints(struct pt_regs *regs, unsigned long instr,
 			      unsigned long ea, int type, int size,
 			      struct arch_hw_breakpoint *info)
 {
@@ -616,7 +616,7 @@ static int cache_op_size(void)
 #endif
 }
 
-static void get_instr_detail(struct pt_regs *regs, struct ppc_inst *instr,
+static void get_instr_detail(struct pt_regs *regs, unsigned long *instr,
 			     int *type, int *size, unsigned long *ea)
 {
 	struct instruction_op op;
@@ -664,7 +664,7 @@ static void larx_stcx_err(struct perf_event *bp, struct arch_hw_breakpoint *info
 
 static bool stepping_handler(struct pt_regs *regs, struct perf_event **bp,
 			     struct arch_hw_breakpoint **info, int *hit,
-			     struct ppc_inst instr)
+			     unsigned long instr)
 {
 	int i;
 	int stepped;
@@ -705,7 +705,7 @@ int hw_breakpoint_handler(struct die_args *args)
 	int hit[HBP_NUM_MAX] = {0};
 	int nr_hit = 0;
 	bool ptrace_bp = false;
-	struct ppc_inst instr = ppc_inst(0);
+	unsigned long instr = ppc_inst(0);
 	int type = 0;
 	int size = 0;
 	unsigned long ea;

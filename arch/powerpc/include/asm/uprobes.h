@@ -24,8 +24,8 @@ typedef ppc_opcode_t uprobe_opcode_t;
 
 struct arch_uprobe {
 	union {
-		struct ppc_inst	insn;
-		struct ppc_inst	ixol;
+		unsigned long	insn;
+		unsigned long	ixol;
 	};
 };
 
