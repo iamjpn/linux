@@ -1309,7 +1309,7 @@ static int __init emulate_compute_instr(struct pt_regs *regs,
 	int analysed;
 	struct instruction_op op;
 
-	if (!regs || !ppc_inst_val(instr))
+	if (!regs || !instr)
 		return -EINVAL;
 
 	regs->nip = patch_site_addr(&patch__exec_instr);
@@ -1333,7 +1333,7 @@ static int __init execute_compute_instr(struct pt_regs *regs,
 {
 	extern int exec_instr(struct pt_regs *regs);
 
-	if (!regs || !ppc_inst_val(instr))
+	if (!regs || !instr)
 		return -EINVAL;
 
 	/* Patch the NOP with the actual instruction */

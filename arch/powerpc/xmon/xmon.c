@@ -2979,7 +2979,7 @@ generic_inst_dump(unsigned long adr, long count, int praddr,
 			printf(REG"  %s", adr, ppc_inst_as_str(inst));
 		printf("\t");
 		if (!ppc_inst_prefixed(inst))
-			dump_func(ppc_inst_val(inst), adr);
+			dump_func(inst, adr);
 		else
 			dump_func(ppc_inst_as_u64(inst), adr);
 		printf("\n");

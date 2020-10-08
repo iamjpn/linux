@@ -105,7 +105,7 @@ static struct aligninfo spe_aligninfo[32] = {
  * so we don't need the address swizzling.
  */
 static int emulate_spe(struct pt_regs *regs, unsigned int reg,
-		       unsigned long ppc_instr)
+		       unsigned long instr)
 {
 	int ret;
 	union {
@@ -116,9 +116,8 @@ static int emulate_spe(struct pt_regs *regs, unsigned int reg,
 	} data, temp;
 	unsigned char __user *p, *addr;
 	unsigned long *evr = &current->thread.evr[reg];
-	unsigned int nb, flags, instr;
+	unsigned int nb, flags;
 
-	instr = ppc_inst_val(ppc_instr);
 	instr = (instr >> 1) & 0x1f;
 
 	/* DAR has the operand effective address */
@@ -316,7 +315,7 @@ int fix_alignment(struct pt_regs *regs)
 
 #ifdef CONFIG_SPE
 	if (ppc_inst_primary_opcode(instr) == 0x4) {
-		int reg = (ppc_inst_val(instr) >> 21) & 0x1f;
+		int reg = (instr >> 21) & 0x1f;
 		PPC_WARN_ALIGNMENT(spe, regs);
 		return emulate_spe(regs, reg, instr);
 	}
@@ -333,7 +332,7 @@ int fix_alignment(struct pt_regs *regs)
 	 * when pasting to a co-processor. Furthermore, paste_last is the
 	 * synchronisation point for preceding copy/paste sequences.
 	 */
-	if ((ppc_inst_val(instr) & 0xfc0006fe) == (PPC_INST_COPY & 0xfc0006fe))
+	if ((instr & 0xfc0006fe) == (PPC_INST_COPY & 0xfc0006fe))
 		return -EIO;
 
 	r = analyse_instr(&op, regs, instr);
