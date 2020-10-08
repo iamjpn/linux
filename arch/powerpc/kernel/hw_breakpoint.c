@@ -577,7 +577,7 @@ static bool check_constraints(struct pt_regs *regs, unsigned long instr,
 		return true;
 	}
 
-	if (unlikely(ppc_inst_equal(instr, ppc_inst(0)))) {
+	if (unlikely(!instr)) {
 		if (cpu_has_feature(CPU_FTR_ARCH_31) &&
 		    !dar_in_hw_range(regs->dar, info))
 			return false;
@@ -733,8 +733,7 @@ int hw_breakpoint_handler(struct die_args *args)
 		info[i]->type &= ~HW_BRK_TYPE_EXTRANEOUS_IRQ;
 
 		if (check_constraints(regs, instr, ea, type, size, info[i])) {
-			if (!IS_ENABLED(CONFIG_PPC_8xx) &&
-			    ppc_inst_equal(instr, ppc_inst(0))) {
+			if (!IS_ENABLED(CONFIG_PPC_8xx) && !instr) {
 				handler_error(bp[i], info[i]);
 				info[i] = NULL;
 				err = 1;

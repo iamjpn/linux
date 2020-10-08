@@ -988,7 +988,7 @@ static void remove_bpts(void)
 		if ((bp->enabled & (BP_TRAP|BP_CIABR)) != BP_TRAP)
 			continue;
 		if (mread_instr(bp->address, &instr)
-		    && ppc_inst_equal(instr, ppc_inst(bpinstr))
+		    && instr == ppc_inst(bpinstr)
 		    && patch_instruction(
 			(unsigned long *)bp->address, ppc_inst_read(bp->instr)) != 0)
 			printf("Couldn't remove breakpoint at %lx\n",
@@ -2966,7 +2966,7 @@ generic_inst_dump(unsigned long adr, long count, int praddr,
 			}
 			break;
 		}
-		if (adr > first_adr && ppc_inst_equal(inst, last_inst)) {
+		if (adr > first_adr && inst == last_inst) {
 			if (!dotted) {
 				printf(" ...\n");
 				dotted = 1;

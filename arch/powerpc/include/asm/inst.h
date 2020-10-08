@@ -89,11 +89,6 @@ static inline int ppc_inst_primary_opcode(unsigned long x)
 	return ppc_inst_val(x) >> 26;
 }
 
-static inline bool ppc_inst_equal(unsigned long x, unsigned long y)
-{
-	return x == y;
-}
-
 static inline int ppc_inst_len(unsigned long x)
 {
 	return ppc_inst_prefixed(x) ? 8 : 4;

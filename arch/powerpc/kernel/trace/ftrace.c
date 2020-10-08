@@ -72,7 +72,7 @@ ftrace_modify_code(unsigned long ip, unsigned long old, unsigned long new)
 		return -EFAULT;
 
 	/* Make sure it is what we expect it to be */
-	if (!ppc_inst_equal(replaced, old)) {
+	if (replaced != old) {
 		pr_err("%p: replaced (%s) != old (%s)",
 		(void *)ip, ppc_inst_as_str(replaced), ppc_inst_as_str(old));
 		return -EINVAL;
@@ -170,8 +170,7 @@ __ftrace_make_nop(struct module *mod,
 	}
 
 	/* We expect either a mflr r0, or a std r0, LRSAVE(r1) */
-	if (!ppc_inst_equal(op, ppc_inst(PPC_INST_MFLR)) &&
-	    !ppc_inst_equal(op, ppc_inst(PPC_INST_STD_LR))) {
+	if (op != ppc_inst(PPC_INST_MFLR) && op != ppc_inst(PPC_INST_STD_LR)) {
 		pr_err("Unexpected instruction %s around bl _mcount\n",
 		       ppc_inst_as_str(op));
 		return -EINVAL;
@@ -202,7 +201,7 @@ __ftrace_make_nop(struct module *mod,
 		return -EFAULT;
 	}
 
-	if (!ppc_inst_equal(op,  ppc_inst(PPC_INST_LD_TOC))) {
+	if (op != ppc_inst(PPC_INST_LD_TOC)) {
 		pr_err("Expected %08x found %s\n", PPC_INST_LD_TOC, ppc_inst_as_str(op));
 		return -EINVAL;
 	}
@@ -500,7 +499,7 @@ expected_nop_sequence(void *ip, unsigned long op0, unsigned long op1)
 	 * The load offset is different depending on the ABI. For simplicity
 	 * just mask it out when doing the compare.
 	 */
-	if (!ppc_inst_equal(op0, ppc_inst(0x48000008)) ||
+	if (op0 != ppc_inst(0x48000008) ||
 	    (ppc_inst_val(op1) & 0xffff0000) != 0xe8410000)
 		return 0;
 	return 1;
@@ -510,7 +509,7 @@ static int
 expected_nop_sequence(void *ip, unsigned long op0, unsigned long op1)
 {
 	/* look for patched "NOP" on ppc64 with -mprofile-kernel */
-	if (!ppc_inst_equal(op0, ppc_inst(PPC_INST_NOP)))
+	if (op0 != ppc_inst(PPC_INST_NOP))
 		return 0;
 	return 1;
 }
@@ -596,7 +595,7 @@ __ftrace_make_call(struct dyn_ftrace *rec, unsigned long addr)
 		return -EFAULT;
 
 	/* It should be pointing to a nop */
-	if (!ppc_inst_equal(op,  ppc_inst(PPC_INST_NOP))) {
+	if (op != ppc_inst(PPC_INST_NOP)) {
 		pr_err("Expected NOP but have %s\n", ppc_inst_as_str(op));
 		return -EINVAL;
 	}
@@ -653,7 +652,7 @@ static int __ftrace_make_call_kernel(struct dyn_ftrace *rec, unsigned long addr)
 		return -EFAULT;
 	}
 
-	if (!ppc_inst_equal(op, ppc_inst(PPC_INST_NOP))) {
+	if (op != ppc_inst(PPC_INST_NOP)) {
 		pr_err("Unexpected call sequence at %p: %s\n", ip, ppc_inst_as_str(op));
 		return -EINVAL;
 	}
