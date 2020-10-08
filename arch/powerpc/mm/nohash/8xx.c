@@ -12,7 +12,6 @@
 #include <linux/hugetlb.h>
 #include <asm/fixmap.h>
 #include <asm/code-patching.h>
-#include <asm/inst.h>
 
 #include <mm/mmu_decl.h>
 

@@ -11,7 +11,6 @@
 #include <asm/cacheflush.h>
 #include <asm/code-patching.h>
 #include <asm/machdep.h>
-#include <asm/inst.h>
 
 #if !defined(CONFIG_64BIT) || defined(CONFIG_PPC_BOOK3E_64)
 extern void epapr_ev_idle(void);
@@ -37,7 +36,7 @@ static int __init early_init_dt_scan_epapr(unsigned long node,
 		return -1;
 
 	for (i = 0; i < (len / 4); i++) {
-		unsigned long inst = ppc_inst(be32_to_cpu(insts[i]));
+		unsigned long inst = be32_to_cpu(insts[i]);
 		patch_instruction((unsigned long *)(epapr_hypercall_start + i), inst);
 #if !defined(CONFIG_64BIT) || defined(CONFIG_PPC_BOOK3E_64)
 		patch_instruction((unsigned long *)(epapr_ev_idle_start + i), inst);

@@ -150,14 +150,14 @@ void patch_imm32_load_insns(unsigned int val, kprobe_opcode_t *addr)
 {
 	/* addis r4,0,(insn)@h */
 	patch_instruction((unsigned long *)addr,
-			  ppc_inst(PPC_INST_ADDIS | ___PPC_RT(4) |
-				   ((val >> 16) & 0xffff)));
+			  PPC_INST_ADDIS | ___PPC_RT(4) |
+			  ((val >> 16) & 0xffff));
 	addr++;
 
 	/* ori r4,r4,(insn)@l */
 	patch_instruction((unsigned long *)addr,
-			  ppc_inst(PPC_INST_ORI | ___PPC_RA(4) |
-				   ___PPC_RS(4) | (val & 0xffff)));
+			  PPC_INST_ORI | ___PPC_RA(4) |
+			  ___PPC_RS(4) | (val & 0xffff));
 }
 
 /*
@@ -168,32 +168,32 @@ void patch_imm64_load_insns(unsigned long val, int reg, kprobe_opcode_t *addr)
 {
 	/* lis reg,(op)@highest */
 	patch_instruction((unsigned long *)addr,
-			  ppc_inst(PPC_INST_ADDIS | ___PPC_RT(reg) |
-				   ((val >> 48) & 0xffff)));
+			  PPC_INST_ADDIS | ___PPC_RT(reg) |
+			  ((val >> 48) & 0xffff));
 	addr++;
 
 	/* ori reg,reg,(op)@higher */
 	patch_instruction((unsigned long *)addr,
-			  ppc_inst(PPC_INST_ORI | ___PPC_RA(reg) |
-				   ___PPC_RS(reg) | ((val >> 32) & 0xffff)));
+			  PPC_INST_ORI | ___PPC_RA(reg) |
+			  ___PPC_RS(reg) | ((val >> 32) & 0xffff));
 	addr++;
 
 	/* rldicr reg,reg,32,31 */
 	patch_instruction((unsigned long *)addr,
-			  ppc_inst(PPC_INST_RLDICR | ___PPC_RA(reg) |
-				   ___PPC_RS(reg) | __PPC_SH64(32) | __PPC_ME64(31)));
+			  PPC_INST_RLDICR | ___PPC_RA(reg) |
+			  ___PPC_RS(reg) | __PPC_SH64(32) | __PPC_ME64(31));
 	addr++;
 
 	/* oris reg,reg,(op)@h */
 	patch_instruction((unsigned long *)addr,
-			  ppc_inst(PPC_INST_ORIS | ___PPC_RA(reg) |
-				   ___PPC_RS(reg) | ((val >> 16) & 0xffff)));
+			  PPC_INST_ORIS | ___PPC_RA(reg) |
+			  ___PPC_RS(reg) | ((val >> 16) & 0xffff));
 	addr++;
 
 	/* ori reg,reg,(op)@l */
 	patch_instruction((unsigned long *)addr,
-			  ppc_inst(PPC_INST_ORI | ___PPC_RA(reg) |
-				   ___PPC_RS(reg) | (val & 0xffff)));
+			  PPC_INST_ORI | ___PPC_RA(reg) |
+			  ___PPC_RS(reg) | (val & 0xffff));
 }
 
 int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *p)
@@ -240,7 +240,7 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *p)
 	pr_devel("Copying template to %p, size %lu\n", buff, size);
 	for (i = 0; i < size; i++) {
 		rc = patch_instruction((unsigned long *)(buff + i),
-				       ppc_inst(*(optprobe_template_entry + i)));
+				       *(optprobe_template_entry + i));
 		if (rc < 0)
 			goto error;
 	}

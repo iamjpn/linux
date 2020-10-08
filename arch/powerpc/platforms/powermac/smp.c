@@ -49,7 +49,6 @@
 #include <asm/keylargo.h>
 #include <asm/pmac_low_i2c.h>
 #include <asm/pmac_pfunc.h>
-#include <asm/inst.h>
 
 #include "pmac.h"
 
@@ -827,7 +826,7 @@ static int smp_core99_kick_cpu(int nr)
 	mdelay(1);
 
 	/* Restore our exception vector */
-	patch_instruction((unsigned long *)vector, ppc_inst(save_vector));
+	patch_instruction((unsigned long *)vector, save_vector);
 
 	local_irq_restore(flags);
 	if (ppc_md.progress) ppc_md.progress("smp_core99_kick_cpu done", 0x347);

@@ -120,7 +120,7 @@ static inline int __access_ok(unsigned long addr, unsigned long size,
 			__gui_inst = ppc_inst_prefix(__prefix,		\
 						     __suffix);		\
 		} else {						\
-			__gui_inst = ppc_inst(__prefix);		\
+			__gui_inst = __prefix;		\
 		}							\
 		if (__gui_ret == 0)					\
 			(dest) = __gui_inst;				\

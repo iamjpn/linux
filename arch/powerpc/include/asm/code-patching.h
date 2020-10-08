@@ -11,7 +11,6 @@
 #include <linux/string.h>
 #include <linux/kallsyms.h>
 #include <asm/asm-compat.h>
-#include <asm/inst.h>
 
 /* Flags for create_branch:
  * "b"   == create_branch(addr, target, 0);
@@ -49,7 +48,7 @@ static inline int patch_branch_site(s32 *site, unsigned long target, int flags)
 static inline int modify_instruction(unsigned int *addr, unsigned int clr,
 				     unsigned int set)
 {
-	return patch_instruction((unsigned long *)addr, ppc_inst((*addr & ~clr) | set));
+	return patch_instruction((unsigned long *)addr, (*addr & ~clr) | set);
 }
 
 static inline int modify_instruction_site(s32 *site, unsigned int clr, unsigned int set)

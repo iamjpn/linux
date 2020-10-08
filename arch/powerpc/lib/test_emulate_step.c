@@ -97,7 +97,7 @@ static void __init test_ld(void)
 	regs.gpr[3] = (unsigned long) &a;
 
 	/* ld r5, 0(r3) */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_LD(5, 3, 0)));
+	stepped = emulate_step(&regs, PPC_RAW_LD(5, 3, 0));
 
 	if (stepped == 1 && regs.gpr[5] == a)
 		show_result("ld", "PASS");
@@ -138,7 +138,7 @@ static void __init test_lwz(void)
 	regs.gpr[3] = (unsigned long) &a;
 
 	/* lwz r5, 0(r3) */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_LWZ(5, 3, 0)));
+	stepped = emulate_step(&regs, PPC_RAW_LWZ(5, 3, 0));
 
 	if (stepped == 1 && regs.gpr[5] == a)
 		show_result("lwz", "PASS");
@@ -182,7 +182,7 @@ static void __init test_lwzx(void)
 	regs.gpr[5] = 0x8765;
 
 	/* lwzx r5, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_LWZX(5, 3, 4)));
+	stepped = emulate_step(&regs, PPC_RAW_LWZX(5, 3, 4));
 	if (stepped == 1 && regs.gpr[5] == a[2])
 		show_result("lwzx", "PASS");
 	else
@@ -200,7 +200,7 @@ static void __init test_std(void)
 	regs.gpr[5] = 0x5678;
 
 	/* std r5, 0(r3) */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_STD(5, 3, 0)));
+	stepped = emulate_step(&regs, PPC_RAW_STD(5, 3, 0));
 	if (stepped == 1 && regs.gpr[5] == a)
 		show_result("std", "PASS");
 	else
@@ -248,7 +248,7 @@ static void __init test_ldarx_stdcx(void)
 	regs.gpr[5] = 0x5678;
 
 	/* ldarx r5, r3, r4, 0 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_LDARX(5, 3, 4, 0)));
+	stepped = emulate_step(&regs, PPC_RAW_LDARX(5, 3, 4, 0));
 
 	/*
 	 * Don't touch 'a' here. Touching 'a' can do Load/store
@@ -266,7 +266,7 @@ static void __init test_ldarx_stdcx(void)
 	regs.gpr[5] = 0x9ABC;
 
 	/* stdcx. r5, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_STDCX(5, 3, 4)));
+	stepped = emulate_step(&regs, PPC_RAW_STDCX(5, 3, 4));
 
 	/*
 	 * Two possible scenarios that indicates successful emulation
@@ -306,7 +306,7 @@ static void __init test_lfsx_stfsx(void)
 	regs.gpr[4] = 0;
 
 	/* lfsx frt10, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_LFSX(10, 3, 4)));
+	stepped = emulate_step(&regs, PPC_RAW_LFSX(10, 3, 4));
 
 	if (stepped == 1)
 		show_result("lfsx", "PASS");
@@ -319,7 +319,7 @@ static void __init test_lfsx_stfsx(void)
 	c.a = 678.91;
 
 	/* stfsx frs10, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_STFSX(10, 3, 4)));
+	stepped = emulate_step(&regs, PPC_RAW_STFSX(10, 3, 4));
 
 	if (stepped == 1 && c.b == cached_b)
 		show_result("stfsx", "PASS");
@@ -396,7 +396,7 @@ static void __init test_lfdx_stfdx(void)
 	regs.gpr[4] = 0;
 
 	/* lfdx frt10, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_LFDX(10, 3, 4)));
+	stepped = emulate_step(&regs, PPC_RAW_LFDX(10, 3, 4));
 
 	if (stepped == 1)
 		show_result("lfdx", "PASS");
@@ -409,7 +409,7 @@ static void __init test_lfdx_stfdx(void)
 	c.a = 987654.32;
 
 	/* stfdx frs10, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_STFDX(10, 3, 4)));
+	stepped = emulate_step(&regs, PPC_RAW_STFDX(10, 3, 4));
 
 	if (stepped == 1 && c.b == cached_b)
 		show_result("stfdx", "PASS");
@@ -514,7 +514,7 @@ static void __init test_lvx_stvx(void)
 	regs.gpr[4] = 0;
 
 	/* lvx vrt10, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_LVX(10, 3, 4)));
+	stepped = emulate_step(&regs, PPC_RAW_LVX(10, 3, 4));
 
 	if (stepped == 1)
 		show_result("lvx", "PASS");
@@ -530,7 +530,7 @@ static void __init test_lvx_stvx(void)
 	c.b[3] = 498532;
 
 	/* stvx vrs10, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_STVX(10, 3, 4)));
+	stepped = emulate_step(&regs, PPC_RAW_STVX(10, 3, 4));
 
 	if (stepped == 1 && cached_b[0] == c.b[0] && cached_b[1] == c.b[1] &&
 	    cached_b[2] == c.b[2] && cached_b[3] == c.b[3])
@@ -571,7 +571,7 @@ static void __init test_lxvd2x_stxvd2x(void)
 	regs.gpr[4] = 0;
 
 	/* lxvd2x vsr39, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_LXVD2X(39, R3, R4)));
+	stepped = emulate_step(&regs, PPC_RAW_LXVD2X(39, R3, R4));
 
 	if (stepped == 1 && cpu_has_feature(CPU_FTR_VSX)) {
 		show_result("lxvd2x", "PASS");
@@ -591,7 +591,7 @@ static void __init test_lxvd2x_stxvd2x(void)
 	c.b[3] = 4;
 
 	/* stxvd2x vsr39, r3, r4 */
-	stepped = emulate_step(&regs, ppc_inst(PPC_RAW_STXVD2X(39, R3, R4)));
+	stepped = emulate_step(&regs, PPC_RAW_STXVD2X(39, R3, R4));
 
 	if (stepped == 1 && cached_b[0] == c.b[0] && cached_b[1] == c.b[1] &&
 	    cached_b[2] == c.b[2] && cached_b[3] == c.b[3] &&
@@ -652,7 +652,7 @@ static struct compute_test compute_tests[] = {
 		.subtests = {
 			{
 				.descr = "R0 = LONG_MAX",
-				.instr = ppc_inst(PPC_INST_NOP),
+				.instr = PPC_INST_NOP,
 				.regs = {
 					.gpr[0] = LONG_MAX,
 				}
@@ -664,7 +664,7 @@ static struct compute_test compute_tests[] = {
 		.subtests = {
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MIN",
-				.instr = ppc_inst(PPC_RAW_ADD(20, 21, 22)),
+				.instr = PPC_RAW_ADD(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MIN,
@@ -672,7 +672,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD(20, 21, 22)),
+				.instr = PPC_RAW_ADD(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MAX,
@@ -680,7 +680,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MAX, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD(20, 21, 22)),
+				.instr = PPC_RAW_ADD(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MAX,
 					.gpr[22] = LONG_MAX,
@@ -688,7 +688,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = ULONG_MAX, RB = ULONG_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD(20, 21, 22)),
+				.instr = PPC_RAW_ADD(20, 21, 22),
 				.regs = {
 					.gpr[21] = ULONG_MAX,
 					.gpr[22] = ULONG_MAX,
@@ -696,7 +696,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = ULONG_MAX, RB = 0x1",
-				.instr = ppc_inst(PPC_RAW_ADD(20, 21, 22)),
+				.instr = PPC_RAW_ADD(20, 21, 22),
 				.regs = {
 					.gpr[21] = ULONG_MAX,
 					.gpr[22] = 0x1,
@@ -704,7 +704,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MIN, RB = INT_MIN",
-				.instr = ppc_inst(PPC_RAW_ADD(20, 21, 22)),
+				.instr = PPC_RAW_ADD(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MIN,
 					.gpr[22] = INT_MIN,
@@ -712,7 +712,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MIN, RB = INT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD(20, 21, 22)),
+				.instr = PPC_RAW_ADD(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MIN,
 					.gpr[22] = INT_MAX,
@@ -720,7 +720,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MAX, RB = INT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD(20, 21, 22)),
+				.instr = PPC_RAW_ADD(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MAX,
 					.gpr[22] = INT_MAX,
@@ -728,7 +728,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = UINT_MAX, RB = UINT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD(20, 21, 22)),
+				.instr = PPC_RAW_ADD(20, 21, 22),
 				.regs = {
 					.gpr[21] = UINT_MAX,
 					.gpr[22] = UINT_MAX,
@@ -736,7 +736,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = UINT_MAX, RB = 0x1",
-				.instr = ppc_inst(PPC_RAW_ADD(20, 21, 22)),
+				.instr = PPC_RAW_ADD(20, 21, 22),
 				.regs = {
 					.gpr[21] = UINT_MAX,
 					.gpr[22] = 0x1,
@@ -750,7 +750,7 @@ static struct compute_test compute_tests[] = {
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MIN",
 				.flags = IGNORE_CCR,
-				.instr = ppc_inst(PPC_RAW_ADD_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADD_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MIN,
@@ -758,7 +758,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADD_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MAX,
@@ -767,7 +767,7 @@ static struct compute_test compute_tests[] = {
 			{
 				.descr = "RA = LONG_MAX, RB = LONG_MAX",
 				.flags = IGNORE_CCR,
-				.instr = ppc_inst(PPC_RAW_ADD_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADD_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MAX,
 					.gpr[22] = LONG_MAX,
@@ -775,7 +775,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = ULONG_MAX, RB = ULONG_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADD_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = ULONG_MAX,
 					.gpr[22] = ULONG_MAX,
@@ -783,7 +783,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = ULONG_MAX, RB = 0x1",
-				.instr = ppc_inst(PPC_RAW_ADD_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADD_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = ULONG_MAX,
 					.gpr[22] = 0x1,
@@ -791,7 +791,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MIN, RB = INT_MIN",
-				.instr = ppc_inst(PPC_RAW_ADD_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADD_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MIN,
 					.gpr[22] = INT_MIN,
@@ -799,7 +799,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MIN, RB = INT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADD_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MIN,
 					.gpr[22] = INT_MAX,
@@ -807,7 +807,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MAX, RB = INT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADD_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MAX,
 					.gpr[22] = INT_MAX,
@@ -815,7 +815,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = UINT_MAX, RB = UINT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADD_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADD_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = UINT_MAX,
 					.gpr[22] = UINT_MAX,
@@ -823,7 +823,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = UINT_MAX, RB = 0x1",
-				.instr = ppc_inst(PPC_RAW_ADD_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADD_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = UINT_MAX,
 					.gpr[22] = 0x1,
@@ -836,7 +836,7 @@ static struct compute_test compute_tests[] = {
 		.subtests = {
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MIN",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MIN,
@@ -844,7 +844,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MAX,
@@ -852,7 +852,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MAX, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MAX,
 					.gpr[22] = LONG_MAX,
@@ -860,7 +860,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = ULONG_MAX, RB = ULONG_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = ULONG_MAX,
 					.gpr[22] = ULONG_MAX,
@@ -868,7 +868,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = ULONG_MAX, RB = 0x1",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = ULONG_MAX,
 					.gpr[22] = 0x1,
@@ -876,7 +876,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MIN, RB = INT_MIN",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MIN,
 					.gpr[22] = INT_MIN,
@@ -884,7 +884,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MIN, RB = INT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MIN,
 					.gpr[22] = INT_MAX,
@@ -892,7 +892,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MAX, RB = INT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MAX,
 					.gpr[22] = INT_MAX,
@@ -900,7 +900,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = UINT_MAX, RB = UINT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = UINT_MAX,
 					.gpr[22] = UINT_MAX,
@@ -908,7 +908,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = UINT_MAX, RB = 0x1",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = UINT_MAX,
 					.gpr[22] = 0x1,
@@ -916,7 +916,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN | INT_MIN, RB = LONG_MIN | INT_MIN",
-				.instr = ppc_inst(PPC_RAW_ADDC(20, 21, 22)),
+				.instr = PPC_RAW_ADDC(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN | (uint)INT_MIN,
 					.gpr[22] = LONG_MIN | (uint)INT_MIN,
@@ -930,7 +930,7 @@ static struct compute_test compute_tests[] = {
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MIN",
 				.flags = IGNORE_CCR,
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MIN,
@@ -938,7 +938,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MAX,
@@ -947,7 +947,7 @@ static struct compute_test compute_tests[] = {
 			{
 				.descr = "RA = LONG_MAX, RB = LONG_MAX",
 				.flags = IGNORE_CCR,
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MAX,
 					.gpr[22] = LONG_MAX,
@@ -955,7 +955,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = ULONG_MAX, RB = ULONG_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = ULONG_MAX,
 					.gpr[22] = ULONG_MAX,
@@ -963,7 +963,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = ULONG_MAX, RB = 0x1",
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = ULONG_MAX,
 					.gpr[22] = 0x1,
@@ -971,7 +971,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MIN, RB = INT_MIN",
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MIN,
 					.gpr[22] = INT_MIN,
@@ -979,7 +979,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MIN, RB = INT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MIN,
 					.gpr[22] = INT_MAX,
@@ -987,7 +987,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = INT_MAX, RB = INT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = INT_MAX,
 					.gpr[22] = INT_MAX,
@@ -995,7 +995,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = UINT_MAX, RB = UINT_MAX",
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = UINT_MAX,
 					.gpr[22] = UINT_MAX,
@@ -1003,7 +1003,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = UINT_MAX, RB = 0x1",
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = UINT_MAX,
 					.gpr[22] = 0x1,
@@ -1011,7 +1011,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN | INT_MIN, RB = LONG_MIN | INT_MIN",
-				.instr = ppc_inst(PPC_RAW_ADDC_DOT(20, 21, 22)),
+				.instr = PPC_RAW_ADDC_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN | (uint)INT_MIN,
 					.gpr[22] = LONG_MIN | (uint)INT_MIN,
@@ -1024,7 +1024,7 @@ static struct compute_test compute_tests[] = {
 		.subtests = {
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MIN",
-				.instr = ppc_inst(PPC_RAW_DIVDE(20, 21, 22)),
+				.instr = PPC_RAW_DIVDE(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MIN,
@@ -1032,7 +1032,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = 1L, RB = 0",
-				.instr = ppc_inst(PPC_RAW_DIVDE(20, 21, 22)),
+				.instr = PPC_RAW_DIVDE(20, 21, 22),
 				.flags = IGNORE_GPR(20),
 				.regs = {
 					.gpr[21] = 1L,
@@ -1041,7 +1041,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_DIVDE(20, 21, 22)),
+				.instr = PPC_RAW_DIVDE(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MAX,
@@ -1054,7 +1054,7 @@ static struct compute_test compute_tests[] = {
 		.subtests = {
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MIN",
-				.instr = ppc_inst(PPC_RAW_DIVDE_DOT(20, 21, 22)),
+				.instr = PPC_RAW_DIVDE_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MIN,
@@ -1062,7 +1062,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = 1L, RB = 0",
-				.instr = ppc_inst(PPC_RAW_DIVDE_DOT(20, 21, 22)),
+				.instr = PPC_RAW_DIVDE_DOT(20, 21, 22),
 				.flags = IGNORE_GPR(20),
 				.regs = {
 					.gpr[21] = 1L,
@@ -1071,7 +1071,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_DIVDE_DOT(20, 21, 22)),
+				.instr = PPC_RAW_DIVDE_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MAX,
@@ -1084,7 +1084,7 @@ static struct compute_test compute_tests[] = {
 		.subtests = {
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MIN",
-				.instr = ppc_inst(PPC_RAW_DIVDEU(20, 21, 22)),
+				.instr = PPC_RAW_DIVDEU(20, 21, 22),
 				.flags = IGNORE_GPR(20),
 				.regs = {
 					.gpr[21] = LONG_MIN,
@@ -1093,7 +1093,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = 1L, RB = 0",
-				.instr = ppc_inst(PPC_RAW_DIVDEU(20, 21, 22)),
+				.instr = PPC_RAW_DIVDEU(20, 21, 22),
 				.flags = IGNORE_GPR(20),
 				.regs = {
 					.gpr[21] = 1L,
@@ -1102,7 +1102,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_DIVDEU(20, 21, 22)),
+				.instr = PPC_RAW_DIVDEU(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MAX,
@@ -1110,7 +1110,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MAX - 1, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_DIVDEU(20, 21, 22)),
+				.instr = PPC_RAW_DIVDEU(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MAX - 1,
 					.gpr[22] = LONG_MAX,
@@ -1118,7 +1118,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN + 1, RB = LONG_MIN",
-				.instr = ppc_inst(PPC_RAW_DIVDEU(20, 21, 22)),
+				.instr = PPC_RAW_DIVDEU(20, 21, 22),
 				.flags = IGNORE_GPR(20),
 				.regs = {
 					.gpr[21] = LONG_MIN + 1,
@@ -1132,7 +1132,7 @@ static struct compute_test compute_tests[] = {
 		.subtests = {
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MIN",
-				.instr = ppc_inst(PPC_RAW_DIVDEU_DOT(20, 21, 22)),
+				.instr = PPC_RAW_DIVDEU_DOT(20, 21, 22),
 				.flags = IGNORE_GPR(20),
 				.regs = {
 					.gpr[21] = LONG_MIN,
@@ -1141,7 +1141,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = 1L, RB = 0",
-				.instr = ppc_inst(PPC_RAW_DIVDEU_DOT(20, 21, 22)),
+				.instr = PPC_RAW_DIVDEU_DOT(20, 21, 22),
 				.flags = IGNORE_GPR(20),
 				.regs = {
 					.gpr[21] = 1L,
@@ -1150,7 +1150,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_DIVDEU_DOT(20, 21, 22)),
+				.instr = PPC_RAW_DIVDEU_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MIN,
 					.gpr[22] = LONG_MAX,
@@ -1158,7 +1158,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MAX - 1, RB = LONG_MAX",
-				.instr = ppc_inst(PPC_RAW_DIVDEU_DOT(20, 21, 22)),
+				.instr = PPC_RAW_DIVDEU_DOT(20, 21, 22),
 				.regs = {
 					.gpr[21] = LONG_MAX - 1,
 					.gpr[22] = LONG_MAX,
@@ -1166,7 +1166,7 @@ static struct compute_test compute_tests[] = {
 			},
 			{
 				.descr = "RA = LONG_MIN + 1, RB = LONG_MIN",
-				.instr = ppc_inst(PPC_RAW_DIVDEU_DOT(20, 21, 22)),
+				.instr = PPC_RAW_DIVDEU_DOT(20, 21, 22),
 				.flags = IGNORE_GPR(20),
 				.regs = {
 					.gpr[21] = LONG_MIN + 1,

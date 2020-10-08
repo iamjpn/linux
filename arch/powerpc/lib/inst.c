@@ -22,7 +22,7 @@ int probe_user_read_inst(unsigned long *inst,
 		err = copy_from_user_nofault(&suffix, (void __user *)nip + 4, 4);
 		*inst = ppc_inst_prefix(val, suffix);
 	} else {
-		*inst = ppc_inst(val);
+		*inst = val;
 	}
 	return err;
 }
@@ -40,7 +40,7 @@ int probe_kernel_read_inst(unsigned long *inst,
 		err = copy_from_kernel_nofault(&suffix, (void *)src + 4, 4);
 		*inst = ppc_inst_prefix(val, suffix);
 	} else {
-		*inst = ppc_inst(val);
+		*inst = val;
 	}
 	return err;
 }
@@ -53,7 +53,7 @@ int probe_user_read_inst(unsigned long *inst,
 
 	err = copy_from_user_nofault(&val, nip, sizeof(val));
 	if (!err)
-		*inst = ppc_inst(val);
+		*inst = val;
 
 	return err;
 }
@@ -66,7 +66,7 @@ int probe_kernel_read_inst(unsigned long *inst,
 
 	err = copy_from_kernel_nofault(&val, src, sizeof(val));
 	if (!err)
-		*inst = ppc_inst(val);
+		*inst = val;
 
 	return err;
 }

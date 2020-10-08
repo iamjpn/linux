@@ -11,8 +11,6 @@
 
 
 #ifdef CONFIG_PPC64
-#define ppc_inst(x) (x)
-
 #define ppc_inst_prefix(x, y) (((unsigned long)(x) << 32) | ((y) & 0xffffffff))
 
 static inline bool ppc_inst_prefixed(unsigned long x)
@@ -49,13 +47,11 @@ static inline unsigned long ppc_inst_read(const unsigned long *ptr)
 		suffix = *((u32 *)ptr + 1);
 		return ppc_inst_prefix(val, suffix);
 	} else {
-		return ppc_inst(val);
+		return val;
 	}
 }
 
 #else
-
-#define ppc_inst(x) (x)
 
 static inline u32 ppc_inst_val(unsigned long x)
 {
@@ -74,7 +70,7 @@ static inline u32 ppc_inst_suffix(unsigned long x)
 
 static inline unsigned long ppc_inst_swab(unsigned long x)
 {
-	return ppc_inst(swab32(ppc_inst_val(x)));
+	return swab32(ppc_inst_val(x));
 }
 
 static inline unsigned long ppc_inst_read(const unsigned long *ptr)

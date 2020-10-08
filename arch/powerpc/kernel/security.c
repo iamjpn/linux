@@ -16,7 +16,6 @@
 #include <asm/debugfs.h>
 #include <asm/security_features.h>
 #include <asm/setup.h>
-#include <asm/inst.h>
 
 
 u64 powerpc_security_features __read_mostly = SEC_FTR_DEFAULT;
@@ -434,7 +433,7 @@ static void update_branch_cache_flush(void)
 	// This controls the branch from guest_exit_cont to kvm_flush_link_stack
 	if (link_stack_flush_type == BRANCH_CACHE_FLUSH_NONE) {
 		patch_instruction_site(&patch__call_kvm_flush_link_stack,
-				       ppc_inst(PPC_INST_NOP));
+				       PPC_INST_NOP);
 	} else {
 		// Could use HW flush, but that could also flush count cache
 		patch_branch_site(&patch__call_kvm_flush_link_stack,
@@ -446,11 +445,11 @@ static void update_branch_cache_flush(void)
 	if (count_cache_flush_type == BRANCH_CACHE_FLUSH_NONE &&
 	    link_stack_flush_type == BRANCH_CACHE_FLUSH_NONE) {
 		patch_instruction_site(&patch__call_flush_branch_caches,
-				       ppc_inst(PPC_INST_NOP));
+				       PPC_INST_NOP);
 	} else if (count_cache_flush_type == BRANCH_CACHE_FLUSH_HW &&
 		   link_stack_flush_type == BRANCH_CACHE_FLUSH_HW) {
 		patch_instruction_site(&patch__call_flush_branch_caches,
-				       ppc_inst(PPC_INST_BCCTR_FLUSH));
+				       PPC_INST_BCCTR_FLUSH);
 	} else {
 		patch_branch_site(&patch__call_flush_branch_caches,
 				  (u64)&flush_branch_caches, BRANCH_SET_LINK);
@@ -458,12 +457,12 @@ static void update_branch_cache_flush(void)
 		// If we just need to flush the link stack, early return
 		if (count_cache_flush_type == BRANCH_CACHE_FLUSH_NONE) {
 			patch_instruction_site(&patch__flush_link_stack_return,
-					       ppc_inst(PPC_INST_BLR));
+					       PPC_INST_BLR);
 
 		// If we have flush instruction, early return
 		} else if (count_cache_flush_type == BRANCH_CACHE_FLUSH_HW) {
 			patch_instruction_site(&patch__flush_count_cache_return,
-					       ppc_inst(PPC_INST_BLR));
+					       PPC_INST_BLR);
 		}
 	}
 }

@@ -149,13 +149,13 @@ NOKPROBE_SYMBOL(arch_prepare_kprobe);
 
 void arch_arm_kprobe(struct kprobe *p)
 {
-	patch_instruction((unsigned long *)p->addr, ppc_inst(BREAKPOINT_INSTRUCTION));
+	patch_instruction((unsigned long *)p->addr, BREAKPOINT_INSTRUCTION);
 }
 NOKPROBE_SYMBOL(arch_arm_kprobe);
 
 void arch_disarm_kprobe(struct kprobe *p)
 {
-	patch_instruction((unsigned long *)p->addr, ppc_inst(p->opcode));
+	patch_instruction((unsigned long *)p->addr, p->opcode);
 }
 NOKPROBE_SYMBOL(arch_disarm_kprobe);
 

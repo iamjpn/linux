@@ -24,7 +24,6 @@
 #include <asm/debug.h>
 #include <asm/debugfs.h>
 #include <asm/hvcall.h>
-#include <asm/inst.h>
 #include <linux/uaccess.h>
 
 /*
@@ -705,7 +704,7 @@ int hw_breakpoint_handler(struct die_args *args)
 	int hit[HBP_NUM_MAX] = {0};
 	int nr_hit = 0;
 	bool ptrace_bp = false;
-	unsigned long instr = ppc_inst(0);
+	unsigned long instr = 0;
 	int type = 0;
 	int size = 0;
 	unsigned long ea;

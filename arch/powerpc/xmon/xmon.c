@@ -946,11 +946,11 @@ static void insert_bpts(void)
 
 		patch_instruction(bp->instr, instr);
 		patch_instruction(ppc_inst_next(bp->instr, &instr),
-				  ppc_inst(bpinstr));
+				  bpinstr);
 		if (bp->enabled & BP_CIABR)
 			continue;
 		if (patch_instruction((unsigned long *)bp->address,
-				      ppc_inst(bpinstr)) != 0) {
+				      bpinstr) != 0) {
 			printf("Couldn't write instruction at %lx, "
 			       "disabling breakpoint there\n", bp->address);
 			bp->enabled &= ~BP_TRAP;
@@ -988,7 +988,7 @@ static void remove_bpts(void)
 		if ((bp->enabled & (BP_TRAP|BP_CIABR)) != BP_TRAP)
 			continue;
 		if (mread_instr(bp->address, &instr)
-		    && instr == ppc_inst(bpinstr)
+		    && instr == bpinstr
 		    && patch_instruction(
 			(unsigned long *)bp->address, ppc_inst_read(bp->instr)) != 0)
 			printf("Couldn't remove breakpoint at %lx\n",
@@ -2954,7 +2954,7 @@ generic_inst_dump(unsigned long adr, long count, int praddr,
 {
 	int nr, dotted;
 	unsigned long first_adr;
-	unsigned long inst, last_inst = ppc_inst(0);
+	unsigned long inst, last_inst = 0;
 
 	dotted = 0;
 	for (first_adr = adr; count > 0; --count, adr += ppc_inst_len(inst)) {
