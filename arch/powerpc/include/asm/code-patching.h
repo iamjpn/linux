@@ -22,10 +22,10 @@
 #define BRANCH_ABSOLUTE	0x2
 
 bool is_offset_in_branch_range(long offset);
-int create_branch(unsigned long *instr, const unsigned long *addr,
-		  unsigned long target, int flags);
-int create_cond_branch(unsigned long *instr, const unsigned long *addr,
-		       unsigned long target, int flags);
+unsigned long create_branch(const unsigned long *addr,
+			   unsigned long target, int flags);
+unsigned long create_cond_branch(const unsigned long *addr,
+				unsigned long target, int flags);
 int patch_branch(unsigned long *addr, unsigned long target, int flags);
 int patch_instruction(unsigned long *addr, unsigned long instr);
 int raw_patch_instruction(unsigned long *addr, unsigned long instr);
@@ -60,8 +60,8 @@ int instr_is_relative_branch(unsigned long instr);
 int instr_is_relative_link_branch(unsigned long instr);
 int instr_is_branch_to_addr(const unsigned long *instr, unsigned long addr);
 unsigned long branch_target(const unsigned long *instr);
-int translate_branch(unsigned long *instr, const unsigned long *dest,
-		     const unsigned long *src);
+unsigned long translate_branch(const unsigned long *dest,
+			      const unsigned long *src);
 extern bool is_conditional_branch(unsigned long instr);
 #ifdef CONFIG_PPC_BOOK3E_64
 void __patch_exception(int exc, unsigned long addr);
