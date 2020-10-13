@@ -19,7 +19,7 @@
  */
 int kvmhv_p9_tm_emulation_early(struct kvm_vcpu *vcpu)
 {
-	u32 instr = vcpu->arch.emul_inst;
+	unsigned long instr = vcpu->arch.emul_inst;
 	u64 newmsr, msr, bescr;
 	int rs;
 

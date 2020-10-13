@@ -432,9 +432,9 @@ static void kvmppc_dump_regs(struct kvm_vcpu *vcpu)
 	for (r = 0; r < vcpu->arch.slb_max; ++r)
 		pr_err("  ESID = %.16llx VSID = %.16llx\n",
 		       vcpu->arch.slb[r].orige, vcpu->arch.slb[r].origv);
-	pr_err("lpcr = %.16lx sdr1 = %.16lx last_inst = %.8x\n",
+	pr_err("lpcr = %.16lx sdr1 = %.16lx last_inst = %s\n",
 	       vcpu->arch.vcore->lpcr, vcpu->kvm->arch.sdr1,
-	       vcpu->arch.last_inst);
+	       ppc_inst_as_str(vcpu->arch.last_inst));
 }
 
 static struct kvm_vcpu *kvmppc_find_vcpu(struct kvm *kvm, int id)
@@ -1167,7 +1167,7 @@ static int kvmppc_hcall_impl_hv(unsigned long cmd)
 
 static int kvmppc_emulate_debug_inst(struct kvm_vcpu *vcpu)
 {
-	u32 last_inst;
+	unsigned long last_inst;
 
 	if (kvmppc_get_last_inst(vcpu, INST_GENERIC, &last_inst) !=
 					EMULATE_DONE) {
@@ -1227,7 +1227,8 @@ static unsigned long kvmppc_read_dpdes(struct kvm_vcpu *vcpu)
  */
 static int kvmppc_emulate_doorbell_instr(struct kvm_vcpu *vcpu)
 {
-	u32 inst, rb, thr;
+	unsigned long inst;
+	u32 rb, thr;
 	unsigned long arg;
 	struct kvm *kvm = vcpu->kvm;
 	struct kvm_vcpu *tvcpu;
@@ -1277,7 +1278,7 @@ static int kvmppc_emulate_doorbell_instr(struct kvm_vcpu *vcpu)
 	default:
 		return EMULATE_FAIL;
 	}
-	kvmppc_set_pc(vcpu, kvmppc_get_pc(vcpu) + 4);
+	kvmppc_set_pc(vcpu, kvmppc_get_pc(vcpu) + ppc_inst_len(inst));
 	return RESUME_GUEST;
 }
 
@@ -1416,7 +1417,7 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
 	case BOOK3S_INTERRUPT_H_EMUL_ASSIST:
 		if (vcpu->arch.emul_inst != KVM_INST_FETCH_FAILED)
 			vcpu->arch.last_inst = kvmppc_need_byteswap(vcpu) ?
-				swab32(vcpu->arch.emul_inst) :
+				ppc_inst_swab(vcpu->arch.emul_inst) :
 				vcpu->arch.emul_inst;
 		if (vcpu->guest_debug & KVM_GUESTDBG_USE_SW_BP) {
 			r = kvmppc_emulate_debug_inst(vcpu);
@@ -5024,7 +5025,7 @@ static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
 
 /* We don't need to emulate any privileged instructions or dcbz */
 static int kvmppc_core_emulate_op_hv(struct kvm_vcpu *vcpu,
-				     unsigned int inst, int *advance)
+				     unsigned long inst, int *advance)
 {
 	return EMULATE_FAIL;
 }

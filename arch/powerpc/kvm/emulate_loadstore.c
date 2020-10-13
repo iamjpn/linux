@@ -71,7 +71,7 @@ static bool kvmppc_check_altivec_disabled(struct kvm_vcpu *vcpu)
  */
 int kvmppc_emulate_loadstore(struct kvm_vcpu *vcpu)
 {
-	u32 inst;
+	unsigned long inst;
 	enum emulation_result emulated = EMULATE_FAIL;
 	int advance = 1;
 	struct instruction_op op;
@@ -364,7 +364,7 @@ int kvmppc_emulate_loadstore(struct kvm_vcpu *vcpu)
 
 	/* Advance past emulated instruction. */
 	if (advance)
-		kvmppc_set_pc(vcpu, kvmppc_get_pc(vcpu) + 4);
+		kvmppc_set_pc(vcpu, kvmppc_get_pc(vcpu) + ppc_inst_len(inst));
 
 	return emulated;
 }

@@ -41,7 +41,7 @@ static void emulate_tx_failure(struct kvm_vcpu *vcpu, u64 failure_cause)
  */
 int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
 {
-	u32 instr = vcpu->arch.emul_inst;
+	unsigned long instr = vcpu->arch.emul_inst;
 	u64 msr = vcpu->arch.shregs.msr;
 	u64 newmsr, bescr;
 	int ra, rs;
@@ -225,7 +225,7 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
 
 	/* What should we do here? We didn't recognize the instruction */
 	kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
-	pr_warn_ratelimited("Unrecognized TM-related instruction %#x for emulation", instr);
+	pr_warn_ratelimited("Unrecognized TM-related instruction %s for emulation", ppc_inst_as_str(instr));
 
 	return RESUME_GUEST;
 }

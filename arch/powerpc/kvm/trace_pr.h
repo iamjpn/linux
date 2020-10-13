@@ -241,14 +241,14 @@ TRACE_EVENT(kvm_exit,
 		" | msr=0x%lx"
 		" | dar=0x%lx"
 		" | srr1=0x%lx"
-		" | last_inst=0x%lx"
+		" | last_inst=%s"
 		,
 		__print_symbolic(__entry->exit_nr, kvm_trace_symbol_exit),
 		__entry->pc,
 		__entry->msr,
 		__entry->dar,
 		__entry->srr1,
-		__entry->last_inst
+		ppc_inst_as_str(__entry->last_inst)
 		)
 );
 

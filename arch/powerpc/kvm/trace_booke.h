@@ -3,6 +3,7 @@
 #define _TRACE_KVM_BOOKE_H
 
 #include <linux/tracepoint.h>
+#include <asm/inst.h>
 
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM kvm_booke
@@ -59,13 +60,13 @@ TRACE_EVENT(kvm_exit,
 		" | pc=0x%lx"
 		" | msr=0x%lx"
 		" | dar=0x%lx"
-		" | last_inst=0x%lx"
+		" | last_inst=%s"
 		,
 		__print_symbolic(__entry->exit_nr, kvm_trace_symbol_exit),
 		__entry->pc,
 		__entry->msr,
 		__entry->dar,
-		__entry->last_inst
+		ppc_inst_as_str(__entry->last_inst)
 		)
 );
 

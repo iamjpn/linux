@@ -236,20 +236,20 @@ void kvmppc_emulate_tabort(struct kvm_vcpu *vcpu, int ra_val)
 #endif
 
 int kvmppc_core_emulate_op_pr(struct kvm_vcpu *vcpu,
-			      unsigned int inst, int *advance)
+			      unsigned long inst, int *advance)
 {
 	int emulated = EMULATE_DONE;
 	int rt = get_rt(inst);
 	int rs = get_rs(inst);
 	int ra = get_ra(inst);
 	int rb = get_rb(inst);
-	u32 inst_sc = 0x44000002;
+	unsigned long inst_sc = 0x44000002;
 
 	switch (get_op(inst)) {
 	case 0:
 		emulated = EMULATE_FAIL;
 		if ((kvmppc_get_msr(vcpu) & MSR_LE) &&
-		    (inst == swab32(inst_sc))) {
+		    (inst == ppc_inst_swab(inst_sc))) {
 			/*
 			 * This is the byte reversed syscall instruction of our
 			 * hypercall handler. Early versions of LE Linux didn't
@@ -1029,12 +1029,12 @@ unprivileged:
 	return emulated;
 }
 
-u32 kvmppc_alignment_dsisr(struct kvm_vcpu *vcpu, unsigned int inst)
+u32 kvmppc_alignment_dsisr(struct kvm_vcpu *vcpu, unsigned long inst)
 {
 	return make_dsisr(inst);
 }
 
-ulong kvmppc_alignment_dar(struct kvm_vcpu *vcpu, unsigned int inst)
+ulong kvmppc_alignment_dar(struct kvm_vcpu *vcpu, unsigned long inst)
 {
 #ifdef CONFIG_PPC_BOOK3S_64
 	/*
@@ -1061,7 +1061,7 @@ ulong kvmppc_alignment_dar(struct kvm_vcpu *vcpu, unsigned int inst)
 		dar += kvmppc_get_gpr(vcpu, rb);
 		break;
 	default:
-		printk(KERN_INFO "KVM: Unaligned instruction 0x%x\n", inst);
+		printk(KERN_INFO "KVM: Unaligned instruction %s\n", ppc_inst_as_str(inst));
 		break;
 	}
 

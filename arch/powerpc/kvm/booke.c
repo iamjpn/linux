@@ -816,8 +816,8 @@ static int emulation_exit(struct kvm_vcpu *vcpu)
 		return RESUME_GUEST;
 
 	case EMULATE_FAIL:
-		printk(KERN_CRIT "%s: emulation at %lx failed (%08x)\n",
-		       __func__, vcpu->arch.regs.nip, vcpu->arch.last_inst);
+		printk(KERN_CRIT "%s: emulation at %lx failed (%s)\n",
+		       __func__, vcpu->arch.regs.nip, ppc_inst_as_str(vcpu->arch.last_inst));
 		/* For debugging, encode the failing instruction and
 		 * report it to userspace. */
 		vcpu->run->hw.hardware_exit_reason = ~0ULL << 32;
@@ -955,7 +955,7 @@ static void kvmppc_restart_interrupt(struct kvm_vcpu *vcpu,
 }
 
 static int kvmppc_resume_inst_load(struct kvm_vcpu *vcpu,
-				  enum emulation_result emulated, u32 last_inst)
+				  enum emulation_result emulated, unsigned long last_inst)
 {
 	switch (emulated) {
 	case EMULATE_AGAIN:
@@ -987,7 +987,7 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 	int r = RESUME_HOST;
 	int s;
 	int idx;
-	u32 last_inst = KVM_INST_FETCH_FAILED;
+	unsigned long last_inst = KVM_INST_FETCH_FAILED;
 	enum emulation_result emulated = EMULATE_DONE;
 
 	/* update before a new last_exit_type is rewritten */

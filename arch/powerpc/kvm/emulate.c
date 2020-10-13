@@ -193,7 +193,7 @@ static int kvmppc_emulate_mfspr(struct kvm_vcpu *vcpu, int sprn, int rt)
  * from opcode tables in the future. */
 int kvmppc_emulate_instruction(struct kvm_vcpu *vcpu)
 {
-	u32 inst;
+	unsigned long inst;
 	int rs, rt, sprn;
 	enum emulation_result emulated;
 	int advance = 1;
@@ -291,8 +291,8 @@ int kvmppc_emulate_instruction(struct kvm_vcpu *vcpu)
 			advance = 0;
 		} else if (emulated == EMULATE_FAIL) {
 			advance = 0;
-			printk(KERN_ERR "Couldn't emulate instruction 0x%08x "
-			       "(op %d xop %d)\n", inst, get_op(inst), get_xop(inst));
+			printk(KERN_ERR "Couldn't emulate instruction %s "
+			       "(op %d xop %d)\n", ppc_inst_as_str(inst), get_op(inst), get_xop(inst));
 		}
 	}
 
