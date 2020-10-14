@@ -1363,7 +1363,8 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	cmpwi	r12,BOOK3S_INTERRUPT_H_EMUL_ASSIST
 	bne	11f
 	mfspr	r3,SPRN_HEIR
-11:	stw	r3,VCPU_HEIR(r9)
+11:
+	std	r3,VCPU_HEIR(r9)
 
 	/* these are volatile across C function calls */
 	mfctr	r3
@@ -2171,10 +2172,16 @@ fast_interrupt_c_return:
 	ori	r4, r3, MSR_DR		/* Enable paging for data */
 	mtmsrd	r4
 	lwz	r8, 0(r10)
+	andis.  r7, r11, SRR1_PREFIXED@h
+	cmpwi   r7,0
+	beq     +4
+	lwz     r5, 4(r10)
+	sldi	r5, r5, 32
+	or	r8, r5, r8
 	mtmsrd	r3
 
 	/* Store the result */
-	stw	r8, VCPU_LAST_INST(r9)
+	std	r8, VCPU_LAST_INST(r9)
 
 	/* Unset guest mode. */
 	li	r0, KVM_GUEST_MODE_HOST_HV
