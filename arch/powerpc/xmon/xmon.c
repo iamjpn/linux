@@ -1731,6 +1731,9 @@ static void print_bug_trap(struct pt_regs *regs)
 #ifdef CONFIG_BUG
 	const struct bug_entry *bug;
 	unsigned long addr;
+#ifdef CONFIG_DEBUG_BUGVERBOSE
+	char *file;
+#endif
 
 	if (regs->msr & MSR_PR)
 		return;		/* not in kernel */
@@ -1744,10 +1747,20 @@ static void print_bug_trap(struct pt_regs *regs)
 		return;
 
 #ifdef CONFIG_DEBUG_BUGVERBOSE
+#ifndef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
+	file = bug->file;
+#else /* relative pointers */
+	file = (char *)bug + bug->file_disp;
+#endif /* relative pointers */
 	printf("kernel BUG at %s:%u!\n",
-	       bug->file, bug->line);
+	       file, bug->line);
 #else
-	printf("kernel BUG at %px!\n", (void *)bug->bug_addr);
+#ifndef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
+	addr = bug->addr;
+#else /* relative pointers */
+	addr = (unsigned long )bug + bug->bug_addr_disp;
+#endif /* relative pointers */
+	printf("kernel BUG at %px!\n", (void *)addr);
 #endif
 #endif /* CONFIG_BUG */
 }

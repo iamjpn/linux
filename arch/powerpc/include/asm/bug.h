@@ -12,7 +12,11 @@
 #ifdef CONFIG_DEBUG_BUGVERBOSE
 .macro EMIT_BUG_ENTRY addr,file,line,flags
 	 .section __bug_table,"aw"
+#ifndef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
 5001:	 PPC_LONG \addr, 5002f
+#else
+5001:	 .4byte \addr - 5001b, 5002f - 5001b
+#endif /* CONFIG_GENERIC_BUG_RELATIVE_POINTERS */
 	 .short \line, \flags
 	 .org 5001b+BUG_ENTRY_SIZE
 	 .previous
@@ -23,7 +27,11 @@
 #else
 .macro EMIT_BUG_ENTRY addr,file,line,flags
 	 .section __bug_table,"aw"
+#ifndef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
 5001:	 PPC_LONG \addr
+#else
+5001:	 .4byte \addr - 5001b
+#endif /* CONFIG_GENERIC_BUG_RELATIVE_POINTERS */
 	 .short \flags
 	 .org 5001b+BUG_ENTRY_SIZE
 	 .previous
@@ -34,20 +42,45 @@
 /* _EMIT_BUG_ENTRY expects args %0,%1,%2,%3 to be FILE, LINE, flags and
    sizeof(struct bug_entry), respectively */
 #ifdef CONFIG_DEBUG_BUGVERBOSE
+#ifndef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
 #define _EMIT_BUG_ENTRY				\
 	".section __bug_table,\"aw\"\n"		\
 	"2:\t" PPC_LONG "1b, %0\n"		\
 	"\t.short %1, %2\n"			\
 	".org 2b+%3\n"				\
 	".previous\n"
-#else
+
+#else /* relative pointers */
+
+#define _EMIT_BUG_ENTRY				\
+	".section __bug_table,\"aw\"\n"		\
+	"2:\t.4byte 1b - 2b, %0 - 2b\n"		\
+	"\t.short %1, %2\n"			\
+	".org 2b+%3\n"				\
+	".previous\n"
+#endif /* relative pointers */
+
+#else /* verbose */
+
+#ifndef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
 #define _EMIT_BUG_ENTRY				\
 	".section __bug_table,\"aw\"\n"		\
 	"2:\t" PPC_LONG "1b\n"			\
 	"\t.short %2\n"				\
 	".org 2b+%3\n"				\
 	".previous\n"
-#endif
+
+#else /* relative pointers */
+
+#define _EMIT_BUG_ENTRY				\
+	".section __bug_table,\"aw\"\n"		\
+	"2:\t.4byte 1b - 2b\n"		\
+	"\t.short %2\n"				\
+	".org 2b+%3\n"				\
+	".previous\n"
+
+#endif /* relative pointers */
+#endif /* verbose */
 
 #define BUG_ENTRY(insn, flags, ...)			\
 	__asm__ __volatile__(				\
