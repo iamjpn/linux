@@ -33,6 +33,8 @@
 
 #include <trace/events/thp.h>
 
+#include <mm/mmu_decl.h>
+
 unsigned int mmu_pid_bits;
 unsigned int mmu_base_pid;
 unsigned long radix_mem_block_size __ro_after_init;
@@ -335,7 +337,7 @@ static void __init radix_init_pgtable(void)
 	phys_addr_t start, end;
 	u64 i;
 
-	if (debug_pagealloc_enabled())
+	if (debug_pagealloc_enabled_or_kfence())
 		size = PAGE_SIZE;
 
 	/* We don't support slb for radix */
@@ -879,7 +881,7 @@ int __meminit radix__create_section_mapping(unsigned long start,
 {
 	unsigned long size = radix_mem_block_size;
 
-	if (debug_pagealloc_enabled())
+	if (debug_pagealloc_enabled_or_kfence())
 		size = PAGE_SIZE;
 
 	if (end >= RADIX_VMALLOC_START) {
@@ -1176,7 +1178,7 @@ int pmd_free_pte_page(pmd_t *pmd, unsigned long addr)
 	return 1;
 }
 
-#ifdef CONFIG_DEBUG_PAGEALLOC
+#if defined(CONFIG_DEBUG_PAGEALLOC) || defined(CONFIG_KFENCE)
 void radix__kernel_map_pages(struct page *page, int numpages, int enable)
 {
 	unsigned long addr = (unsigned long)page_address(page);
