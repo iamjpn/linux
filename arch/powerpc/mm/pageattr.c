@@ -54,6 +54,12 @@ static int change_page_attr(pte_t *ptep, unsigned long addr, void *data)
 	case SET_MEMORY_X:
 		pte = pte_mkexec(pte);
 		break;
+	case SET_MEMORY_DIS:
+		pte = pte_mkabsent(pte);
+		break;
+	case SET_MEMORY_EN:
+		pte = pte_mkpresent(pte);
+		break;
 	default:
 		WARN_ON_ONCE(1);
 		break;

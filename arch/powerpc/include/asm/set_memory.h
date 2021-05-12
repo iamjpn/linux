@@ -6,6 +6,8 @@
 #define SET_MEMORY_RW	1
 #define SET_MEMORY_NX	2
 #define SET_MEMORY_X	3
+#define SET_MEMORY_EN	4
+#define SET_MEMORY_DIS	5
 
 int change_memory_attr(unsigned long addr, int numpages, long action);
 

@@ -137,6 +137,8 @@ extern void radix__mark_rodata_ro(void);
 extern void radix__mark_initmem_nx(void);
 #endif
 
+void radix__kernel_map_pages(struct page *page, int numpages, int enable);
+
 extern void radix__ptep_set_access_flags(struct vm_area_struct *vma, pte_t *ptep,
 					 pte_t entry, unsigned long address,
 					 int psize);

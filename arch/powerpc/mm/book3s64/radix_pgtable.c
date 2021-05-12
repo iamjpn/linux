@@ -16,6 +16,7 @@
 #include <linux/hugetlb.h>
 #include <linux/string_helpers.h>
 #include <linux/memory.h>
+#include <linux/set_memory.h>
 
 #include <asm/pgalloc.h>
 #include <asm/mmu_context.h>
@@ -330,8 +331,12 @@ static int __meminit create_physical_mapping(unsigned long start,
 static void __init radix_init_pgtable(void)
 {
 	unsigned long rts_field;
+	unsigned long size = radix_mem_block_size;
 	phys_addr_t start, end;
 	u64 i;
+
+	if (debug_pagealloc_enabled())
+		size = PAGE_SIZE;
 
 	/* We don't support slb for radix */
 	mmu_slb_size = 0;
@@ -352,7 +357,7 @@ static void __init radix_init_pgtable(void)
 		}
 
 		WARN_ON(create_physical_mapping(start, end,
-						radix_mem_block_size,
+						size,
 						-1, PAGE_KERNEL));
 	}
 
@@ -872,13 +877,18 @@ int __meminit radix__create_section_mapping(unsigned long start,
 					    unsigned long end, int nid,
 					    pgprot_t prot)
 {
+	unsigned long size = radix_mem_block_size;
+
+	if (debug_pagealloc_enabled())
+		size = PAGE_SIZE;
+
 	if (end >= RADIX_VMALLOC_START) {
 		pr_warn("Outside the supported range\n");
 		return -1;
 	}
 
 	return create_physical_mapping(__pa(start), __pa(end),
-				       radix_mem_block_size, nid, prot);
+				       size, nid, prot);
 }
 
 int __meminit radix__remove_section_mapping(unsigned long start, unsigned long end)
@@ -1165,3 +1175,15 @@ int pmd_free_pte_page(pmd_t *pmd, unsigned long addr)
 
 	return 1;
 }
+
+#ifdef CONFIG_DEBUG_PAGEALLOC
+void radix__kernel_map_pages(struct page *page, int numpages, int enable)
+{
+	unsigned long addr = (unsigned long)page_address(page);
+
+	if (enable)
+		change_memory_attr(addr, numpages, SET_MEMORY_EN);
+	else
+		change_memory_attr(addr, numpages, SET_MEMORY_DIS);
+}
+#endif

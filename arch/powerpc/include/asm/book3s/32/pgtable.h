@@ -417,6 +417,16 @@ static inline unsigned long pte_pfn(pte_t pte)
 }
 
 /* Generic modifiers for PTE bits */
+static inline pte_t pte_mkabsent(pte_t pte)
+{
+	return __pte(pte_val(pte) & ~_PAGE_PRESENT);
+}
+
+static inline pte_t pte_mkpresent(pte_t pte)
+{
+	return __pte(pte_val(pte) | _PAGE_PRESENT);
+}
+
 static inline pte_t pte_wrprotect(pte_t pte)
 {
 	return __pte(pte_val(pte) & ~_PAGE_RW);

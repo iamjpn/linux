@@ -651,6 +651,16 @@ static inline unsigned long pte_pfn(pte_t pte)
 }
 
 /* Generic modifiers for PTE bits */
+static inline pte_t pte_mkabsent(pte_t pte)
+{
+	return __pte_raw(pte_raw(pte) & cpu_to_be64(~_PAGE_PRESENT));
+}
+
+static inline pte_t pte_mkpresent(pte_t pte)
+{
+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_PRESENT));
+}
+
 static inline pte_t pte_wrprotect(pte_t pte)
 {
 	if (unlikely(pte_savedwrite(pte)))
@@ -811,6 +821,15 @@ static inline bool check_pte_access(unsigned long access, unsigned long ptev)
 /*
  * Generic functions with hash/radix callbacks
  */
+
+#ifdef CONFIG_DEBUG_PAGEALLOC
+static inline void __kernel_map_pages(struct page *page, int numpages, int enable)
+{
+	if (radix_enabled())
+		radix__kernel_map_pages(page, numpages, enable);
+	hash__kernel_map_pages(page, numpages, enable);
+}
+#endif
 
 static inline void __ptep_set_access_flags(struct vm_area_struct *vma,
 					   pte_t *ptep, pte_t entry,

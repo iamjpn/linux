@@ -179,6 +179,8 @@ static inline unsigned long hash__pte_update(struct mm_struct *mm,
 	return old;
 }
 
+void hash__kernel_map_pages(struct page *page, int numpages, int enable);
+
 /* Set the dirty and/or accessed bits atomically in a linux PTE, this
  * function doesn't need to flush the hash entry
  */
