@@ -101,13 +101,17 @@ static inline void hw_breakpoint_disable(void)
 	for (i = 0; i < nr_wp_slots(); i++)
 		__set_breakpoint(i, &null_brk);
 }
+
 extern void thread_change_pc(struct task_struct *tsk, struct pt_regs *regs);
 int hw_breakpoint_handler(struct die_args *args);
+inline void breakpoint_pause(void);
+inline void breakpoint_unpause(void);
 
 #else	/* CONFIG_HAVE_HW_BREAKPOINT */
 static inline void hw_breakpoint_disable(void) { }
 static inline void thread_change_pc(struct task_struct *tsk,
 					struct pt_regs *regs) { }
+
 
 #endif	/* CONFIG_HAVE_HW_BREAKPOINT */
 

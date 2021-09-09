@@ -688,6 +688,31 @@ DEFINE_INTERRUPT_HANDLER(do_break)
 
 static DEFINE_PER_CPU(struct arch_hw_breakpoint, current_brk[HBP_NUM_MAX]);
 
+/* Disable the breakpoint in hardware without touching current_brk[] */
+inline void breakpoint_pause(void)
+{
+	struct arch_hw_breakpoint brk = {0};
+	int i;
+
+	if (!ppc_breakpoint_available())
+		return;
+
+	for (i = 0; i < nr_wp_slots(); i++)
+		____set_breakpoint(i, &brk);
+}
+
+/* Renable the breakpoint in hardware from current_brk[] */
+inline void breakpoint_unpause(void)
+{
+	int i;
+	if (!ppc_breakpoint_available())
+		return;
+
+	for (i = 0; i < nr_wp_slots(); i++)
+		____set_breakpoint(i, this_cpu_ptr(&current_brk[i]));
+}
+
+
 #ifdef CONFIG_PPC_ADV_DEBUG_REGS
 /*
  * Set the debug registers back to their default "safe" values.
@@ -865,10 +890,8 @@ static inline int set_breakpoint_8xx(struct arch_hw_breakpoint *brk)
 	return 0;
 }
 
-void __set_breakpoint(int nr, struct arch_hw_breakpoint *brk)
+inline void ____set_breakpoint(int nr, struct arch_hw_breakpoint *brk)
 {
-	memcpy(this_cpu_ptr(&current_brk[nr]), brk, sizeof(*brk));
-
 	if (dawr_enabled())
 		// Power8 or later
 		set_dawr(nr, brk);
@@ -880,6 +903,12 @@ void __set_breakpoint(int nr, struct arch_hw_breakpoint *brk)
 	else
 		// Shouldn't happen due to higher level checks
 		WARN_ON_ONCE(1);
+}
+
+void __set_breakpoint(int nr, struct arch_hw_breakpoint *brk)
+{
+	memcpy(this_cpu_ptr(&current_brk[nr]), brk, sizeof(*brk));
+	____set_breakpoint(nr, brk);
 }
 
 /* Check if we have DAWR or DABR hardware */
