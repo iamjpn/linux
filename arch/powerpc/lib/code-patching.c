@@ -12,6 +12,8 @@
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <linux/random.h>
+#include <linux/sched/mm.h>
+#include <asm/pgalloc.h>
 
 #include <asm/tlbflush.h>
 #include <asm/page.h>
@@ -101,45 +103,89 @@ static int text_area_cpu_down(unsigned int cpu)
 	return 0;
 }
 
-static __always_inline void __poking_init_temp_mm(void)
+static int __poking_init_temp_mm(unsigned int cpu)
 {
-	int cpu;
-	spinlock_t *ptl; /* for protecting pte table */
+	spinlock_t *ptl;
 	pte_t *ptep;
 	struct mm_struct *patching_mm;
 	unsigned long patching_addr;
 
-	for_each_possible_cpu(cpu) {
-		patching_mm = copy_init_mm();
-		WARN_ON(!patching_mm);
-		per_cpu(cpu_patching_mm, cpu) = patching_mm;
+	patching_mm = copy_init_mm();
+	WARN_ON(!patching_mm);
 
-		/*
-		 * Choose a randomized, page-aligned address from the range:
-		 * [PAGE_SIZE, DEFAULT_MAP_WINDOW - PAGE_SIZE] The lower
-		 * address bound is PAGE_SIZE to avoid the zero-page.  The
-		 * upper address bound is DEFAULT_MAP_WINDOW - PAGE_SIZE to
-		 * stay under DEFAULT_MAP_WINDOW with the Book3s64 Hash MMU.
-		 */
-		patching_addr = PAGE_SIZE + ((get_random_long() & PAGE_MASK)
-				% (DEFAULT_MAP_WINDOW - 2 * PAGE_SIZE));
-		per_cpu(cpu_patching_addr, cpu) = patching_addr;
+	this_cpu_write(cpu_patching_mm, patching_mm);
 
-		/*
-		 * PTE allocation uses GFP_KERNEL which means we need to
-		 * pre-allocate the PTE here because we cannot do the
-		 * allocation during patching when IRQs are disabled.
-		 */
-		ptep = get_locked_pte(patching_mm, patching_addr, &ptl);
-		WARN_ON(!ptep);
-		pte_unmap_unlock(ptep, ptl);
-	}
+	/*
+	 * Choose a randomized, page-aligned address from the range:
+	 * [PAGE_SIZE, DEFAULT_MAP_WINDOW - PAGE_SIZE] The lower
+	 * address bound is PAGE_SIZE to avoid the zero-page.  The
+	 * upper address bound is DEFAULT_MAP_WINDOW - PAGE_SIZE to
+	 * stay under DEFAULT_MAP_WINDOW with the Book3s64 Hash MMU.
+	 */
+	patching_addr = PAGE_SIZE + ((get_random_long() & PAGE_MASK) %
+				     (DEFAULT_MAP_WINDOW - 2 * PAGE_SIZE));
+
+
+	/*
+	 * PTE allocation uses GFP_KERNEL which means we need to
+	 * pre-allocate the PTE here because we cannot do the
+	 * allocation during patching when IRQs are disabled.
+	 * ptl is not needed but it avoids open coding allocating a pte
+	 * in patching_mm.
+	 */
+	ptep = get_locked_pte(patching_mm, patching_addr, &ptl);
+	WARN_ON(!ptep);
+	pte_unmap_unlock(ptep, ptl);
+
+	this_cpu_write(cpu_patching_addr, patching_addr);
+
+	return 0;
+}
+
+static int __poking_deinit_temp_mm(unsigned int cpu)
+{
+	struct mm_struct *mm;
+	unsigned long addr;
+	pte_t *ptep;
+	pmd_t *pmdp;
+	pud_t *pudp;
+	p4d_t *p4dp;
+	pgd_t *pgdp;
+
+	mm = __this_cpu_read(cpu_patching_mm);
+	addr = __this_cpu_read(cpu_patching_addr);
+
+	pgdp = pgd_offset(mm, addr);
+
+	p4dp = p4d_offset(pgdp, addr);
+
+	pudp = pud_offset(p4dp, addr);
+
+	pmdp = pmd_offset(pudp, addr);
+
+	ptep = pte_offset_map(pmdp, addr);
+
+	pte_free(mm, ptep);
+	mm_dec_nr_ptes(mm);
+	pmd_free(mm, pmdp);
+	mm_dec_nr_pmds(mm);
+	pud_free(mm, pudp);
+	mm_dec_nr_puds(mm);
+	p4d_free(mm, p4dp);
+
+	// pgd is dropped in mmdrop
+	//pgd_free(mm, pgdp);
+
+	mmdrop(mm);
+	return 0;
 }
 
 void __init poking_init(void)
 {
 	if (radix_enabled()) {
-		__poking_init_temp_mm();
+		cpuhp_setup_state(CPUHP_AP_ONLINE_DYN,
+				  "powerpc/text_poke:online", __poking_init_temp_mm,
+				  __poking_deinit_temp_mm);
 		return;
 	}
 
